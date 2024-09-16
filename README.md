@@ -12,13 +12,11 @@ This is a template you can use to start building new selfbots easier with [disco
 
 ## Setup
 
-```bash
-git clone https://github.com/mallusrgreatv2/ts-selfbot-base.git
-cd ts-selfbot-base
-yarn
-cp .env.example .env # configure the .env file
-yarn start
-```
+- Copy paste the `.env.example` file and name the new copy `.env`.
+- Configure the `.env` file with your account token.
+- Add the channel ID where you want the bot to function in `src/config.ts` file (you can also change the other values if needed).
+- For first time, you should start the bot by starting the `setup.bat` file if on Windows. For other OSes, you'll have to manually install Node.js and Yarn and then run `yarn start` command.
+- If it's not your first time then you can directly run the bot with the command `yarn start`.
 
 ## Environment Variables
 
@@ -28,14 +26,7 @@ To run this project, you will need to add the following environment variable(s) 
 
 ## Configuration
 
-You can configure the selfbot's aspects in config.json
-You can access this using \<Selfbot\>.config.\<configuration\> like so: `selfbot.config.prefix`
-
-## Screenshots
-
-(![Help and ping command](https://github.com/mallusrgreatv2/ts-selfbot-base/assets/69511006/de590f18-eda3-4644-9f5e-6375ac6ba64e)
-
-## Roadmap
+You can configure the selfbot's aspects in src/config.ts
 
 ## License
 
