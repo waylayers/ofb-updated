@@ -1,14 +1,13 @@
-# Selfbot Base (Typescript)
+# OwO Farm Bot Updated (Typescript)
 
-This is a template you can use to start building new selfbots easier with [discord.js-selfbot-v13](https://npm.im/discord.js-selfbot-v13) in Node.js with TypeScript.
+This selfbot was made using the [ts-selfbot-base](https://github.com/waylayers/ts-selfbot-base) template which uses [discord.js-selfbot-v13](https://npm.im/discord.js-selfbot-v13) in Node.js with TypeScript.
 
 ## Features
 
 - Nice logging
-- File-related handlers done easy
-- Create commands and events easily
-- Extremely typesafe
-- Runtime type checking with zod
+- Hunt and battle supported
+- Automatically clears checklist
+- Automatically uses inventory items (crates, lootboxes, gems, etc.)
 
 ## Setup
 
