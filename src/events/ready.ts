@@ -10,7 +10,7 @@ export default new SelfbotEvent({
       farm(selfbot);
     } else {
       selfbot.logger.info(
-        `Start the bot by entering "start" command here or in the discord server as "${selfbot.config.prefix}start".`
+        `Start the bot by entering "start" command here or in a discord server as "${selfbot.config.prefix}start".`
       );
     }
     selfbot.logger.info(
