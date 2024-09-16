@@ -13,6 +13,7 @@ export default async function farm(selfbot: Selfbot) {
     await waitRandomDelay(18000);
     if (selfbot.safeToUseCommand) {
       farmHunt(selfbot);
+      await waitRandomDelay(3500);
       farmBattle(selfbot);
     }
   }
