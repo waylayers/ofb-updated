@@ -13,6 +13,7 @@ This selfbot was made using the [ts-selfbot-base](https://github.com/waylayers/t
 
 - Copy paste the `.env.example` file and name the new copy `.env`.
 - Configure the `.env` file with your account token.
+- Copy paste `src/config/config.default.ts` to `src/config/config.ts`.
 - Add the channel ID where you want the bot to function in `src/config.ts` file (you can also change the other values if needed).
 - For first time, you should start the bot by starting the `setup.bat` file if on Windows. For other OSes, you'll have to manually install Node.js and Yarn and then run `yarn start` command.
 - If it's not your first time then you can directly run the bot with the command `yarn start`.

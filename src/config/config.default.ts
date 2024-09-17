@@ -2,7 +2,7 @@ export default {
   /** the prefix of the selfbot, i.e if your prefix is ">" then you can use >pause and >resume */
   prefix: ">",
   /** the channel id the owo commands will be used in */
-  mainChannelId: "731903287976263770",
+  mainChannelId: "",
   /** whether the selfbot should use these commands periodically or not */
   commands: {
     hunt: true,
@@ -26,7 +26,7 @@ export default {
       enabled: {
         daily: true,
         cookie: true,
-        vote: false,
+        vote: true,
       },
     },
     inventory: {

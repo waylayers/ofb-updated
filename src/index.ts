@@ -17,12 +17,12 @@ new Handler({
     const parsed = CommandParser.safeParse(cmd);
     if (!parsed.success) {
       client.logger.error(
-        `Issues detected in command ${dir}: ${fromZodError(parsed.error)}`
+        `❌ Issues detected in command ${dir}: ${fromZodError(parsed.error)}`
       );
       return;
     }
     client.commands.set(parsed.data.name, parsed.data);
-    client.logger.info(`Registered command ${parsed.data.name} (${dir})`);
+    client.logger.info(`✅ Registered command ${parsed.data.name} (${dir})`);
   },
 });
 
@@ -33,29 +33,35 @@ new Handler({
     const parsed = EventParser.safeParse(cmd);
     if (!parsed.success) {
       client.logger.error(
-        `Issues detected in event: ${fromZodError(parsed.error)}`
+        `❌ Issues detected in event: ${fromZodError(parsed.error)}`
       );
       return;
     }
     client.on(parsed.data.name, (...args) => parsed.data.run(client, ...args));
-    client.logger.info(`Registered event ${parsed.data.name} (${dir})`);
+    client.logger.info(`✅ Registered event ${parsed.data.name} (${dir})`);
   },
 });
 client.start();
 const rl = readline.createInterface({ input, output });
 rl.on("line", (input) => {
   if (input.startsWith("pause")) {
-    console.log(client.setPaused(true));
+    client.logger.info(`Paused: ${client.setPaused(true) ? "Yes" : "No"}`);
   }
   if (input.startsWith("resume")) {
-    console.log(client.setPaused(false));
+    client.logger.info(`Paused: ${client.setPaused(false) ? "Yes" : "No"}`);
   }
   if (input.startsWith("toggle")) {
-    console.log(client.setPaused());
+    client.logger.info(`Paused: ${client.setPaused() ? "Yes" : "No"}`);
   }
   if (input.startsWith("start")) {
-    if (client.status.started) return console.log(false);
+    if (client.status.started)
+      return client.logger.info(`❌ Bot is already started`);
     farm(client);
-    console.log((client.status.started = true));
+    client.status.started = true;
+    client.logger.info(`✅ Bot is now started!`);
+  }
+  if (input.startsWith("stats")) {
+    const stats = client.getStats(true, true) as string[];
+    stats.forEach((x) => client.logger.info(x));
   }
 });

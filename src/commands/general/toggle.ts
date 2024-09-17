@@ -5,6 +5,6 @@ export default new SelfbotCommand({
   description: "Toggle farming",
   async run({ selfbot, message }) {
     const paused = selfbot.setPaused();
-    return message.reply(`Selfbot is now ${paused ? "paused" : "resumed"}`);
+    return message.reply(`✅ Selfbot is now ${paused ? "paused" : "resumed"}`);
   },
 });

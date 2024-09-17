@@ -1,6 +1,7 @@
 import Selfbot from "../structures/client.js";
 import phrases from "../config/phrases.js";
 import waitRandomDelay from "../functions/wait.js";
+import { emitter } from "../events/owoMessages.js";
 export default async function sendRandomPhrase(selfbot: Selfbot) {
   if (selfbot.paused) return;
   if (!selfbot.config.settings.autoPhrases) return;
@@ -8,5 +9,6 @@ export default async function sendRandomPhrase(selfbot: Selfbot) {
   if (!phrase) return;
   await waitRandomDelay(2000);
   await selfbot.mainChannel.send(phrase);
-  selfbot.logger.info("[Phrases] Sent random phrase");
+  selfbot.logger.info("✅ [Phrases] Sent random phrase");
+  emitter.emit("randomPhrase");
 }

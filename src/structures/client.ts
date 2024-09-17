@@ -9,14 +9,18 @@ import { CommandParser, EnvTokenParser } from "../parsers.js";
 import Logger from "./logger.js";
 import { z } from "zod";
 import botConfig from "../config/config.js";
+import prettyMs from "pretty-ms";
 export default class Selfbot extends Client {
   logger = new Logger();
   config = botConfig;
   commands = new Collection<string, z.infer<typeof CommandParser>>();
+  pausedTime: number | null = null;
   paused = false;
   setPaused(paused?: boolean) {
     this.updateRPC();
     this.paused = paused || !this.paused;
+    if (paused) this.pausedTime = Date.now();
+    else this.pausedTime = null;
     return this.paused;
   }
   status = {
@@ -26,6 +30,16 @@ export default class Selfbot extends Client {
     gems: {
       needed: [] as string[],
       toUse: [] as string[],
+    },
+    info: {
+      hunts: 0,
+      battles: {
+        lost: 0,
+        won: 0,
+      },
+      inventoryChecks: 0,
+      randomPhrasesSent: 0,
+      checklistDone: true,
     },
   };
   constructor() {
@@ -75,5 +89,28 @@ export default class Selfbot extends Client {
   }
   get safeToUseCommand() {
     return !this.paused && !this.status.doingCommand;
+  }
+  getStats(pad: boolean = false, l: boolean = false) {
+    const { info: i } = this.status;
+    const lines = [];
+    const padstr = (str: string) => (pad ? str.padEnd(12, " ") : str);
+    lines.push(
+      `| ${padstr("Checklist")} >> ${i.checklistDone ? "Done" : "Undone"}`
+    );
+    lines.push(
+      `| ${padstr("Paused")} >> ${
+        this.paused && this.pausedTime
+          ? `Yes (since ${prettyMs(Date.now() - this.pausedTime)})`
+          : "No"
+      }`
+    );
+    lines.push(`| ${padstr("Hunts")} >> ${i.hunts}`);
+    lines.push(`| ${padstr("Battles")} >> ${i.battles.won + i.battles.lost}`);
+    lines.push(`| ${padstr("> Won")} >> ${i.battles.won}`);
+    lines.push(`| ${padstr("> Lost")} >> ${i.battles.lost}`);
+    lines.push(`| ${padstr("Inv checks")} >> ${i.inventoryChecks}`);
+    lines.push(`| ${padstr("Phrases sent")} >> ${i.randomPhrasesSent}`);
+    if (l === true) return lines;
+    return lines.join("\n");
   }
 }

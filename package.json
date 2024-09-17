@@ -10,7 +10,7 @@
     "build:compile": "tsup",
     "build:lint": "eslint --fix",
     "build": "npm-run-all clean build:*",
-    "start": "yarn && yarn build && node --no-warnings dist/index.js"
+    "start": "yarn && yarn build && node --no-warnings --enable-source-maps dist/index.js"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.6.1",
@@ -34,6 +34,7 @@
     "node-notifier": "^10.0.1",
     "open": "^10.1.0",
     "parse-numeric-range": "^1.3.0",
+    "pretty-ms": "^9.1.0",
     "zod": "^3.22.4",
     "zod-validation-error": "^3.0.2"
   },

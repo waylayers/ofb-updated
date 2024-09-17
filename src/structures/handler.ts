@@ -26,7 +26,7 @@ export default class Handler {
         );
       } catch (err) {
         this.bot.logger.error(
-          `Issue when loading handler at file ${
+          `❌ Issue when loading handler at file ${
             file.substring(
               0,
               file.lastIndexOf(".") < 0 ? file.length : file.lastIndexOf(".")

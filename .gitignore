@@ -122,3 +122,4 @@ web_modules/
 .pnp.*
 
 dist
+src/config/config.ts

@@ -1,4 +1,3 @@
-import EventEmitter from "events";
 import SelfbotEvent from "../structures/event.js";
 import notifier from "node-notifier";
 import open from "open";
@@ -7,7 +6,16 @@ import checkInventory from "../farm/checkInventory.js";
 import numberRange from "parse-numeric-range";
 import farmHunt from "../farm/hunt.js";
 import sendRandomPhrase from "../farm/sendRandomPhrase.js";
-export const emitter = new EventEmitter();
+import TypedEventEmitter from "../structures/typed-emitter.js";
+import { listFormat } from "../functions/listFormat.js";
+type EventTypes = {
+  inventory: [];
+  checklist: [];
+  hunt: [];
+  randomPhrase: [];
+  battle: [];
+};
+export const emitter = new TypedEventEmitter<EventTypes>();
 export default new SelfbotEvent({
   name: "messageCreate",
   async run(selfbot, message) {
@@ -39,13 +47,20 @@ export default new SelfbotEvent({
       const values = message.content
         .match(/`([0-9]+)`/g)
         ?.map((v) => v.replaceAll("`", ""));
-      if (!values) return;
+      if (!values) {
+        emitter.emit("inventory");
+        return selfbot.logger.info(
+          "✅ [Inventory] Done checking, no items found."
+        );
+      }
+      const used: string[] = [];
       if (
         values.includes("050") &&
         selfbot.config.settings.inventory.autoUse.lootbox
       ) {
         await waitRandomDelay(4000);
         await selfbot.owoCommand("lb all");
+        used.push("lootboxes");
       }
       if (
         values.includes("049") &&
@@ -53,6 +68,7 @@ export default new SelfbotEvent({
       ) {
         await waitRandomDelay(4000);
         await selfbot.owoCommand("lootbox fabled all");
+        used.push("fabled lootboxes");
       }
       if (
         values.includes("100") &&
@@ -60,6 +76,7 @@ export default new SelfbotEvent({
       ) {
         await waitRandomDelay(4000);
         await selfbot.owoCommand("wc all");
+        used.push("weapon crates");
       }
       if (!selfbot.config.settings.inventory.autoUse.gems) return;
       const { needed: neededGems } = selfbot.status.gems;
@@ -77,14 +94,20 @@ export default new SelfbotEvent({
       await waitRandomDelay(4000);
       if (selfbot.status.gems.toUse.length) {
         selfbot.logger.info(
-          `[Auto Gems] Using gems ${selfbot.status.gems.toUse.join(", ")}`
+          `✅ [Auto Gems] Using gems ${selfbot.status.gems.toUse.join(", ")}`
         );
         await selfbot.owoCommand(`use ${selfbot.status.gems.toUse.join(" ")}`);
+        used.push("gems");
         selfbot.status.gems.needed = [];
         selfbot.status.gems.toUse = [];
       }
       selfbot.status.doingCommand = false;
-      selfbot.logger.info("[Inventory] Inventory checking done");
+      selfbot.logger.info(
+        `✅ [Inventory] Inventory checking done, auto used: ${listFormat.format(
+          used.length ? used : ["none"]
+        )}`
+      );
+      emitter.emit("inventory");
     };
     const checklist = async () => {
       const embed = message.embeds[0];
@@ -97,14 +120,14 @@ export default new SelfbotEvent({
         await waitRandomDelay(3000);
         await selfbot.owoCommand("daily");
       }
-      selfbot.logger.info("[Checklist] Daily done");
+      selfbot.logger.info("✅ [Checklist] Daily done");
       if (
         embed.description?.includes("⬛ 📝") &&
         selfbot.config.settings.checklist.enabled.vote
       )
         await open("https://top.gg/bot/408785106942164992/vote");
       else {
-        selfbot.logger.info("[Checklist] Vote done");
+        selfbot.logger.info("✅ [Checklist] Vote done");
       }
       if (
         embed.description?.includes("⬛ 🍪") &&
@@ -113,7 +136,8 @@ export default new SelfbotEvent({
         await waitRandomDelay(3000);
         await selfbot.owoCommand("cookie <@408785106942164992>");
       }
-      selfbot.logger.info("[Checklist] Cookie done");
+      selfbot.logger.info("✅ [Checklist] Cookie done");
+      emitter.emit("checklist");
       selfbot.status.doingCommand = false;
       if (selfbot.config.settings.inventory.check) checkInventory(selfbot);
       else if (selfbot.config.commands.hunt) farmHunt(selfbot);
@@ -126,19 +150,44 @@ export default new SelfbotEvent({
       );
       if (selfbot.status.gems.needed.length) {
         selfbot.logger.info(
-          `[Hunt] Missing gems: ${selfbot.status.gems.needed.join(", ")}`
+          `⚠️ [Hunt] Missing gems: ${selfbot.status.gems.needed.join(", ")}`
         );
       }
       await waitRandomDelay(1000);
-      selfbot.logger.info("[Hunt] Done successfully");
+      selfbot.logger.info("✅ [Hunt] Done hunting");
       await sendRandomPhrase(selfbot);
       await waitRandomDelay(10_000);
       selfbot.status.doingCommand = false;
       checkInventory(selfbot);
-      selfbot.logger.info("[Hunt] Done hunting...");
+      emitter.emit("hunt");
+    };
+    const battle = async () => {
+      if (
+        message.content.includes(
+          "Create a team with the command `owo team add {animal}`"
+        )
+      ) {
+        return selfbot.logger.info(
+          "⚠️ [Battle] Couldn't battle: Create a team to battle"
+        );
+      }
+      if (
+        !message.embeds[0] ||
+        !message.embeds[0].author?.name.includes("goes into battle!")
+      )
+        return;
+      return selfbot.logger.info("✅ [Battle] Successfully started battle.");
     };
     checklist();
     inventory();
     hunt();
+    battle();
   },
 });
+export async function awaitEvent(type: keyof EventTypes) {
+  return new Promise<void>((resolve) => {
+    emitter.once(type, () => {
+      resolve();
+    });
+  });
+}
